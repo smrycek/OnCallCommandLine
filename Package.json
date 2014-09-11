@@ -1,0 +1,33 @@
+{
+  "name": "OnCallEscalationManager",
+  "version": "0.0.1",
+  "author": "Sean Rycek, Shiv Patel, Dalton Shehan",
+  "description": "An application to handle the creation, configuration, and management of an automatic on call manager.",
+  "contributors": [
+    {
+      "name": "Sean Rycek",
+      "email": "smrycek@ncsu.edu"
+    },
+    {
+      "name": "Dalton Shehan",
+      "email": "ldshehan@ncsu.edu"
+    },
+    {
+      "name": "Shiv Patel",
+      "email": "shpatel5@ncsu.edu"
+    }
+  ],
+  "main": "./server.js",
+  "keywords": [],
+  "dependencies": {
+    "promptly": "0.2.0",
+    "request": "2.42.0"
+  },
+  "noAnalyze": true,
+  "engines": {
+    "node": ">=0.6"
+  },
+  "scripts": {
+    "start": "node ./Server.js"
+  }
+}
