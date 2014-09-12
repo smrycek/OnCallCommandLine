@@ -4,25 +4,26 @@ var promptly = require('promptly'),
 
 
 function promptApplication(callback) {
-    var name, phone, fallbackName, fallbackNumber;
+    var app = new Object();
+    //var name, phone, fallbackName, fallbackNumber;
     console.log("");
     console.log("Add New Application");
     console.log("-------------------");
-    if (!name) {
+    if (!app.name) {
         promptly.prompt('Application Name: ', function (err, retName) {
-            name = retName;
-            if (!phone) {
+            app.name = retName;
+            if (!app.phone) {
                 promptly.prompt('Phone Number: ', { validator: PhoneValidator }, function (err, retPhone) {
-                    phone = retPhone;
-                    if (!fallbackName) {
+                    app.phone = retPhone;
+                    if (!app.fallbackName) {
                         promptly.prompt('Fallback Name: ', function (err, retFallback) {
-                            fallbackName = retFallback;
-                            if (!fallbackNumber) {
+                            app.fallbackName = retFallback;
+                            if (!app.fallbackNumber) {
                                 promptly.prompt('Fallback Number: ', { validator: PhoneValidator }, function (err, retFallback) {
-                                    fallbackNumber = retFallback;
-                                    if (name && phone && fallbackName && fallbackNumber) {
+                                    app.fallbackNumber = retFallback;
+                                    if (app.name && app.phone && app.fallbackName && app.fallbackNumber) {
                                         console.log("");
-                                        callback(name, phone, fallbackName, fallbackNumber, promptAction);
+                                        callback(app, promptAction);
                                     }
                                 });
                             }
@@ -39,9 +40,9 @@ function promptApplication(callback) {
             throw new Error('Phone number must be in the form:\n###-###-####');
         }
 
-        if (phone) {
+        if (app.phone) {
             //If phone is set, we are entering the fallback number. These 2 numbers cannot be the same or an infinite call loop may occur. (if thats even possible)
-            if (phone == value) {
+            if (app.phone == value) {
                 throw new Error('Fallback number cannot be the same as the application number.');
             }
         }
@@ -64,26 +65,26 @@ function promptAction() {
     });
 }
 
-function addApplication(name, phone, fallbackName, fallbackPhone, callback) {
-    var applicationController = require('./lib/controllers/ApplicationController.js'),
-        staffController = require('./lib/controllers/StaffController.js');
+function addApplication(app, callback) {
+    var makePost = require('./lib/MakePost.js');
 
-    applicationController.add(name, phone, function (err, doc) {
-        if (err) {
-            console.log("Error adding application " + name);
-            console.log("");
-            callback();
-        } else {
-            staffController.add(fallbackName, fallbackPhone, true, doc._id, function (err, doc) {
-                if (err) {
-                    console.log("Error adding fallback staff member " + fallbackName);
+    makePost.postStaff(app, function (body) {
+        var staff = JSON.parse(body);
+        if (staff.status === "Success") {
+            console.log("Staffer successfully added.");
+            app.id = staff.id;
+            makePost.postApplication(app, function (body) {
+                var application = JSON.parse(body);
+                if (application.status === "Success") {
+                    console.log("Application successfully added.");
                 } else {
-                    console.log("Successfully added " + name + " with fallback staffer " + fallbackName);
+                    console.log("Failed to add application.");
                 }
-                console.log("");
-                callback();
             });
+        } else {
+            console.log("Failed to add staffer.");
         }
+        callback();
     });
 }
 
