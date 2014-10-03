@@ -79,7 +79,7 @@ function addApplication(app, callback) {
                 var staff = JSON.parse(body);
                 if (staff.Status === "Success") {
                     console.log("Staffer successfully added.");
-                    app.id = staff.results._id;
+                    app.id = staff.id;
                     makePost.updateFallback(app, function (body) {
                         var application = body;
                         if (application.Status === "Success") {
