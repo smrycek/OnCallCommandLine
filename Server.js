@@ -35,9 +35,12 @@ function promptApplication(callback) {
     }
 
     var PhoneValidator = function (value) {
-        var pattern = /^\d{3}-\d{3}-\d{4}/;
+        var pattern = /^\d{10}$/,
+        nondigit = /\D/g,
+        value = value.replace(nondigit, "");
+
         if (!pattern.test(value)) {
-            throw new Error('Phone number must be in the form:\n###-###-####');
+            err = new Error('Number did not consist of 10 digits.');
         }
 
         if (app.phone) {
