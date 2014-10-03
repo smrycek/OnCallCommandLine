@@ -68,23 +68,32 @@ function promptAction() {
 function addApplication(app, callback) {
     var makePost = require('./lib/MakePost.js');
 
-    makePost.postStaff(app, function (body) {
-        var staff = JSON.parse(body);
-        if (staff.status === "Success") {
-            console.log("Staffer successfully added.");
-            app.id = staff.id;
-            makePost.postApplication(app, function (body) {
-                var application = JSON.parse(body);
-                if (application.status === "Success") {
-                    console.log("Application successfully added.");
+    makePost.postApplication(app, function (body) {
+        var application = JSON.parse(body);
+        if (application.Status === "Success") {
+            console.log("Application successfully added.");
+            makePost.postStaff(app, function (body) {
+                var staff = JSON.parse(body);
+                if (staff.Status === "Success") {
+                    console.log("Staffer successfully added.");
+                    app.id = staff.results._id;
+                    makePost.updateFallback(app, function (body) {
+                        var application = body;
+                        if (application.Status === "Success") {
+                            console.log("Fallback successfully added.");
+                        } else {
+                            console.log(application);
+                            console.log("Failed to add fallback.");
+                        }
+                    });
                 } else {
-                    console.log("Failed to add application.");
+                    console.log("Failed to add staffer.");
                 }
             });
         } else {
-            console.log("Failed to add staffer.");
+            console.log(application);
+            console.log("Failed to add application.");
         }
-        callback();
     });
 }
 
